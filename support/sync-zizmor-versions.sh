@@ -36,6 +36,27 @@ lookup_pinned_digest() {
     awk -v tag="${1}" '$1 == tag { print $2; exit }' "${PINS}"
 }
 
+check_duplicate_pins() {
+    duplicates=$(awk 'NF && seen[$1]++ { print $1 }' "${PINS}" | sort -u | paste -sd ' ' -)
+
+    if [[ -n "${duplicates}" ]]; then
+        die "pins file contains duplicate tag(s): ${duplicates}"
+    fi
+}
+
+check_pin_digests() {
+    malformed=$(awk 'NF && $2 !~ /^sha256:[0-9a-f]{64}$/ { print $1 }' "${PINS}" |
+        sort -u | paste -sd ' ' -)
+
+    if [[ -n "${malformed}" ]]; then
+        die "pins file contains malformed digest(s): ${malformed}"
+    fi
+}
+
+# Validate the existing pins before reusing them.
+check_duplicate_pins
+check_pin_digests
+
 # For each tag, reuse an existing digest when possible. New tags and `latest`
 # are resolved with `skopeo inspect` and emitted as:
 # <tag> <digest>
