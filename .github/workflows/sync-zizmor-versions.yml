@@ -24,7 +24,12 @@ jobs:
         run: sudo apt install -y skopeo jq
 
       - name: Sync zizmor versions
-        run: ./support/sync-zizmor-versions.sh > ./support/versions
+        run: |
+          # Write to a temp file and swap, since redirecting directly to
+          # support/versions would truncate it before the script reads its pins.
+          tmp="$(mktemp)"
+          ./support/sync-zizmor-versions.sh ./support/versions > "${tmp}"
+          mv "${tmp}" ./support/versions
 
       - name: Create or update pull request
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
@@ -38,7 +43,7 @@ jobs:
 
             Changes were detected to the `ghcr.io/zizmorcore/zizmor` image's tags.
 
-            This PR updates the `versions` file with any tag and digest changes.
+            This PR updates the `versions` file with new tags and digest changes.
 
             Please review manually before merging.
 
