@@ -154,6 +154,10 @@ See `zizmor`'s [Input collection] documentation for more information.
 
 *Default*: `true`
 
+> [!NOTE]
+> This input's default is the **opposite** of the `zizmor` CLI default, since every
+> GitHub Actions job receives a GitHub API token by default.
+
 `online-audits` controls whether `zizmor` runs online audits. Running without
 `online-audits` is faster but will produce fewer results.
 
