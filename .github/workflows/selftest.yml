@@ -229,6 +229,24 @@ jobs:
         env:
           OUTPUT_FILE: ${{ steps.zizmor.outputs.output-file }}
 
+  selftest-collect:
+    name: "TEST: 'collect: actions` only collections action inputs"
+    runs-on: ubuntu-latest
+    permissions: {}
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: ./
+        id: zizmor
+        with:
+          advanced-security: false
+          collect: actions
+
+      # TODO: Would be nice to grep the input or similar here to confirm we only collected `./action.yml`.
+
   all-selftests-pass:
     if: always()
 
@@ -244,6 +262,7 @@ jobs:
       - selftest-fail-on-no-inputs-xfail
       - selftest-fail-on-no-inputs-disabled
       - selftest-output-file-output-is-present-when-advanced-security
+      - selftest-collect
 
     runs-on: ubuntu-latest
 
